@@ -1,4 +1,4 @@
-#include "distribution.hpp"
+#include "gmm.hpp"
 #include "numerics.hpp"
 
 #include <cmath>
@@ -268,6 +268,21 @@ void GaussianMixtureModel::estimate(vector<mat> samples) {
     last_l = _score;
   }        
 
+}
+
+int GaussianMixtureModel::argmax(arma::mat sample) {
+  double max = ZERO;
+  int max_component = -1;
+  int k = this -> weights.size();
+  
+  for(int i = 0; i < k; i++) {
+    double p = lg(this -> weights[i]) + this -> components[i] -> evaluate(sample);
+    if(p > max) {
+      max = p;
+      max_component = i;
+    }
+  }
+  return max_component; 
 }
 
 Gaussian* GaussianMixtureModel::get_pdf(int i) {

@@ -5,7 +5,7 @@
 #include <armadillo>
 
 #define CONV_TH 1e-6
-#define EM_MAX_ITER 150
+#define EM_MAX_ITER 300
 
 /**
    A collection of probability distributions
@@ -20,16 +20,6 @@ public:
 
   virtual double evaluate(arma::mat sample) = 0;
   virtual void estimate(std::vector<arma::mat> data) = 0;
-
-};
-
-class StubDistribution : public Distribution {
-  
-public:
-
-  double evaluate(arma::mat sample) {return 0;};
-
-  void estimate(std::vector<arma::mat> data) {};
 
 };
 
@@ -85,7 +75,7 @@ public:
   GaussianMixtureModel(int k);
   
   int k();
-
+  
   /**
    calculate the joint probability
    of the sample given the model   
@@ -93,6 +83,11 @@ public:
   */
   double evaluate(arma::mat sample);
   
+  /**
+     Find the maximum component
+   **/
+  int argmax(arma::mat sample);
+
   /**
      compute the expected values P(xi|muj, sigma_j)   
      formular (4) in [1] 

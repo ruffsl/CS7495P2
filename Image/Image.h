@@ -11,7 +11,7 @@ namespace cs7495
 	private:
 		float lattitude;		///< GPS lattitude
 		float longitude;		///< GPS longitude
-		unsigned int timestamp;	///< Time stamp in seconds
+		time_t timestamp;		///< Time stamp in seconds
 	public:
 		/// <summary>
 		/// Default constructor.
@@ -21,7 +21,7 @@ namespace cs7495
 		/// <summary>
 		/// Construct an image from file and separate data.
 		/// </summary>
-		Image(const std::string& filename, float lattitute, float longitude, unsigned int timestamp, int flags = 1);
+		Image(const std::string& filename, float lattitute, float longitude, time_t timestamp, int flags = 1);
 
 		/// <summary>
 		/// Set GPS coordinates.
@@ -34,7 +34,7 @@ namespace cs7495
 		/// Set time stamp.
 		/// </summary>
 		/// <param name="timestamp">[in] Time stamp</param>
-		void setTimeStamp(unsigned int timestamp);
+		void setTimeStamp(time_t timestamp);
 	};
 
 }

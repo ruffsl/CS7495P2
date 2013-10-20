@@ -10,7 +10,7 @@ namespace cs7495
 		timestamp = -1;
 	};
 
-	Image::Image(const std::string& filename, float lattitude, float longitude, unsigned int timestamp, int flags) :
+	Image::Image(const std::string& filename, float lattitude, float longitude, time_t timestamp, int flags) :
 		lattitude(lattitude), longitude(longitude), timestamp(timestamp)
 	{
 		cv::Mat tmp = cv::imread(filename, flags);
@@ -23,7 +23,7 @@ namespace cs7495
 		this->longitude = longitude;
 	};
 
-	void Image::setTimeStamp(unsigned int timestamp)
+	void Image::setTimeStamp(time_t timestamp)
 	{
 		this->timestamp = timestamp;
 	};

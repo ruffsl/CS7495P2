@@ -1,11 +1,4 @@
 #include "Extractor.h"
-#include "utils.h"
-
-
-#include <time.h>
-#include <kml/dom.h>
-#include <kml/base/date_time.h>
-
 #include <opencv2/opencv.hpp>
 
 namespace cs7495
@@ -85,11 +78,12 @@ namespace cs7495
 		// Format
 		std::string date = vect3[1];
 		std::string time = vect3[2];
-		std::stringstream ss;
-		ss << date.substr(0, 4) << "-" << date.substr(4, 2) << "-" << date.substr(6, 2)
-		   << "T" << time.substr(0, 2) << ":" << time.substr(2, 2) << ":" << time.substr(4, 2) << "Z";
-
-		// Get POSIX time
-		kmlbase::DateTime timestamp = kmlbase::DateTime::Create(ss.str());
+		
+		timestamp.year = (unsigned int) atoi(date.substr(0, 4).c_str());
+		timestamp.month = (unsigned int) atoi(date.substr(4, 2).c_str());
+		timestamp.day = (unsigned int) atoi(date.substr(6, 2).c_str());
+		timestamp.hour = (unsigned int) atoi(time.substr(0, 2).c_str());
+		timestamp.min = (unsigned int) atoi(time.substr(2, 2).c_str());
+		timestamp.sec = (unsigned int) atoi(time.substr(4, 2).c_str());
 	};
 }

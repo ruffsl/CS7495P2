@@ -1,8 +1,8 @@
 #include "Image.h"
+#include "utils.h"
 
 namespace cs7495
 {
-
 	/// <summary>
 	/// Class to extract frames from a video and associate
 	/// a GPS location from a KML file.
@@ -11,7 +11,7 @@ namespace cs7495
 	{
 	private:
 		std::vector<Image> frames;	///< Contains all the frames in the video
-		time_t timestamp;
+		TimeStamp timestamp;		///< Reference time stamp (when recording started)
 
 	public:
 		/// <summary>

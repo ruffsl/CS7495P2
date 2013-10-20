@@ -1,6 +1,12 @@
 #include "Extractor.h"
+#include "utils.h"
 
-#include <opencv2\opencv.hpp>
+
+#include <time.h>
+#include <kml/dom.h>
+#include <kml/base/date_time.h>
+
+#include <opencv2/opencv.hpp>
 
 namespace cs7495
 {
@@ -31,7 +37,7 @@ namespace cs7495
 		// Counter on the number of frames
 		int counter = 0;
 		// Open video file
-		cv::VideoCapture cap("VID_20131019_133249.mp4");
+		cv::VideoCapture cap(filepath);
 		//cap.open(filepath);
 		// If successful
 		if (cap.isOpened())
@@ -47,6 +53,7 @@ namespace cs7495
 				std::stringstream ss;
 				ss << "frame_" << counter << ".jpeg";
 				cv::imwrite(ss.str(), tmp);
+				std::cout << "Writing " << ss << "..." << std::endl;
 				counter++;
 			}
 			cap.release();
@@ -55,5 +62,34 @@ namespace cs7495
 		{
 			std::cout << "Error: could not open " << filepath << std::endl;
 		}
+	};
+
+
+	void Extractor::getTimeName(const std::string& filepath)
+	{
+		// Get file name
+		char slash;
+#ifdef _WIN32
+		slash = '\\';
+#else
+		slash = '\/';
+#endif
+		std::vector<std::string> vect1 = split(filepath, slash);
+
+		// Remove extension
+		std::vector<std::string> vect2 = split(vect1[vect1.size()-1], '.');
+
+		// Split
+		std::vector<std::string> vect3 = split(vect2[0], '_');
+
+		// Format
+		std::string date = vect3[1];
+		std::string time = vect3[2];
+		std::stringstream ss;
+		ss << date.substr(0, 4) << "-" << date.substr(4, 2) << "-" << date.substr(6, 2)
+		   << "T" << time.substr(0, 2) << ":" << time.substr(2, 2) << ":" << time.substr(4, 2) << "Z";
+
+		// Get POSIX time
+		kmlbase::DateTime timestamp = kmlbase::DateTime::Create(ss.str());
 	};
 }

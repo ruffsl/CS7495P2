@@ -11,7 +11,8 @@ int main(int argc, char** argv)
 		Usage();
 
 	Extractor extractor;
-	extractor.video2images(argv[argc-1]);
+	extractor.getTimeName(argv[argc-1]);
+	//extractor.video2images(argv[argc-1]);
 
 	return 0;
 }

@@ -10,7 +10,9 @@ namespace cs7495
 		std::string item;
 		while (std::getline(ss, item, delim))
 		{
-			elems.push_back(item);
+			// No empty string
+			if (item.compare("") != 0)
+				elems.push_back(item);
 		}
 		return elems;
 	};

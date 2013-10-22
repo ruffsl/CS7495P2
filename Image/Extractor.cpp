@@ -1,5 +1,7 @@
 #include "Extractor.h"
 #include <opencv2/opencv.hpp>
+#include <fstream>
+#include <string>
 
 namespace cs7495
 {
@@ -93,5 +95,37 @@ namespace cs7495
 		timestamp.hour = (unsigned int) atoi(time.substr(0, 2).c_str());
 		timestamp.min = (unsigned int) atoi(time.substr(2, 2).c_str());
 		timestamp.sec = (unsigned int) atoi(time.substr(4, 2).c_str());
+	};
+
+	void Extractor::readGeoData(const std::string& filepath)
+	{
+		// Open text file
+		std::ifstream myfile(filepath.c_str());
+		if (!myfile.is_open())
+			return;
+
+		std::string line;
+		// Parse line by line
+		while ( std::getline(myfile, line) )
+		{
+			// Skip empty lines
+			if ( line.compare("") == 0)
+				continue;
+			// Tokenize line
+			std::vector<std::string> tokens = split(line, ' ');
+			// If line starts with 'T'
+			if (tokens[0].compare("T") == 0)
+			{
+				// Add time stamp
+				std::string timestamp = "";
+				timestamp += tokens[1] + " " + tokens[2];
+				timestamps.push_back(timestamp);
+				// Add GPS coordinates
+				float coord[2] = {0};
+				coord[0] = atof(tokens[3].c_str());
+				coord[1] = atof(tokens[4].c_str());
+				GPScoord.push_back(coord);
+			}
+		}
 	};
 }

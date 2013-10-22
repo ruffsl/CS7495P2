@@ -11,8 +11,9 @@ int main(int argc, char** argv)
 		Usage();
 
 	Extractor extractor;
-	extractor.getTimeName(argv[argc-1]);
-	extractor.video2images(argv[argc-1]);
+	//extractor.getTimeName(argv[argc-1]);
+	//extractor.video2images(argv[argc-1]);
+	extractor.readGeoData("C:\\Users\\Bruno\\Documents\\_SCHOOL\\GeorgiaTech\\2013 Fall\\CS 7495 Computer Vision\\Project 2\\20131019_133249\\Walkingfrom10thtoTSRB.txt");
 
 	return 0;
 }

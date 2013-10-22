@@ -10,8 +10,10 @@ namespace cs7495
 	class Extractor
 	{
 	private:
-		std::vector<Image> frames;	///< Contains all the frames in the video
-		TimeStamp timestamp;		///< Reference time stamp (when recording started)
+		std::vector<Image> frames;			///< Contains all the frames in the video
+		TimeStamp timestamp;				///< Reference time stamp (when recording started)
+		std::vector<std::string> timestamps;///< List of time stamps written as strings, e.g. "2013-10-19 17:32:43.537"
+		std::vector<float*> GPScoord;		///< List of GPS coordinates written as an array of two floating point numbers, e.g. {33.782714000, -84.395934000}
 
 	public:
 		/// <summary>
@@ -38,5 +40,12 @@ namespace cs7495
 		/// </summary>
 		/// <param name="filepath">[in] Path to the video file</param>
 		void getTimeName(const std::string& filepath);
+
+		/// <summary>
+		/// Open a text file containing time stamps and GPS coordinates
+		/// and read them in.
+		/// </summary>
+		/// <param name=""filepath">[in] Path to the text file</param>
+		void readGeoData(const std::string& filepath);
 	};
 }

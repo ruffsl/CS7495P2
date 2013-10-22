@@ -7,23 +7,23 @@ namespace cs7495
 	{
 	};
 
-	void Extractor::breakVideo(const std::string& filepath)
-	{
-		cv::VideoCapture cap;
-		if (cap.open(filepath))
-		{
-			while (true)
-			{
-				// Read next frame
-				Image tmp;
-				// If no next frame, then break
-				if (!cap.read(tmp)) break;
-				// Otherwise, add it to the vector of features
-				frames.push_back(tmp);
-			}
-			cap.release();
-		}
-	};
+	//void Extractor::breakVideo(const std::string& filepath)
+	//{
+	//	cv::VideoCapture cap;
+	//	if (cap.open(filepath))
+	//	{
+	//		while (true)
+	//		{
+	//			// Read next frame
+	//			Image tmp;
+	//			// If no next frame, then break
+	//			if (!cap.read(tmp)) break;
+	//			// Otherwise, add it to the vector of features
+	//			frames.push_back(tmp);
+	//		}
+	//		cap.release();
+	//	}
+	//};
 
 	void Extractor::video2images(const std::string& filepath)
 	{
@@ -45,8 +45,16 @@ namespace cs7495
 				// Otherwise, save it
 				std::stringstream ss;
 				ss << "frame_" << counter << ".jpeg";
-				cv::imwrite(ss.str(), tmp);
+				tmp.write(ss.str());
 				std::cout << "Writing " << ss << "..." << std::endl;
+				// Extract SIFT
+				tmp.computeSIFT();
+				// Save image overlayed with SIFT as well
+				Image sift = tmp.showSIFT();
+				std::stringstream sss;
+				sss << "frame_" << counter << "_sift.jpeg";
+				sift.write(sss.str());
+				// Increment counter
 				counter++;
 			}
 			cap.release();

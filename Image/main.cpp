@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 
 	Extractor extractor;
 	extractor.getTimeName(argv[argc-1]);
-	//extractor.video2images(argv[argc-1]);
+	extractor.video2images(argv[argc-1]);
 
 	return 0;
 }

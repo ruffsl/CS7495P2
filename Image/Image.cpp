@@ -27,4 +27,22 @@ namespace cs7495
 	{
 		this->timestamp = timestamp;
 	};
+
+	void Image::computeSIFT()
+	{
+		cv::SIFT sift;
+		sift(*this, cv::Mat(), keyPoints, descriptors);
+	};
+
+	Image Image::showSIFT()
+	{
+		Image out;
+		cv::drawKeypoints(*this, keyPoints, out);
+		return out;
+	};
+
+	void Image::write(const std::string& filename)
+	{
+		cv::imwrite(filename, *this);
+	};
 }

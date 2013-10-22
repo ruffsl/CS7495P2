@@ -23,7 +23,7 @@ namespace cs7495
 		/// Extract all frames from a video file.
 		/// </summary>
 		/// <param name="filepath">[in] Path to the video file</param>
-		void breakVideo(const std::string& filepath);
+		//void breakVideo(const std::string& filepath);
 
 		/// <summary>
 		/// Extract each frame and saves it as a JPEG file

@@ -91,28 +91,24 @@ namespace cs7495
 		std::vector<std::string> vect3 = split(vect2[0], '_');
 		// Format
 		std::string date = "";
-		date += vect3[1] + " " + vect3[2];
+		date += vect3[1] + " " + vect3[2] + " EDT";
 		// Set up the input date time format.
-		local_time_input_facet *input_facet = new local_time_input_facet("%Y%m%d %H%M%S");
+		local_time_input_facet *input_facet = new local_time_input_facet("%Y%m%d %H%M%S %ZP");
 		// Read time
 		std::stringstream ss;
 		ss.imbue(std::locale(ss.getloc(), input_facet));
 		ss.str(date);
 		ss >> *firstFrameTime;
 
-		//std::cout << "Local time:\t"  << firstFrameTime->local_time() << std::endl;
+		std::cout << "Full Time:\t"   << firstFrameTime->to_string() << std::endl;
+		std::cout << "Local time:\t"  << firstFrameTime->local_time() << std::endl;
 		std::cout << "Time zone:\t"   << firstFrameTime->zone_as_posix_string() << std::endl;
 		std::cout << "Zone abbrev:\t" << firstFrameTime->zone_abbrev() << std::endl;
 		std::cout << "Zone offset:\t" << firstFrameTime->zone_abbrev(true) << std::endl;
-
-		delete input_facet;
 	};
 
 	void Extractor::readGeoData(const std::string& filepath)
 	{
-		// Set up the input datetime format.
-		local_time_input_facet *input_facet = new local_time_input_facet("%Y-%m-%d %H:%M:%S%f");
-
 		// Open text file
 		std::ifstream myfile(filepath.c_str());
 		if (!myfile.is_open())
@@ -132,7 +128,9 @@ namespace cs7495
 			{
 				// Add time stamp
 				std::string timestamp = "";
-				timestamp += tokens[1] + " " + tokens[2];
+				timestamp += tokens[1] + " " + tokens[2] + " UTC+4";
+				// Set up the input datetime format.
+				local_time_input_facet *input_facet = new local_time_input_facet("%Y-%m-%d %H:%M:%S%f %ZP");
 				// Read time
 				std::stringstream ss;
 				ss.imbue(std::locale(ss.getloc(), input_facet));
@@ -142,6 +140,19 @@ namespace cs7495
 				// Insert boost local_time into list
 				timestamps.push_back(ldt);
 
+				std::cout << "\nFull Time:\t"   << ldt.to_string() << std::endl;
+				std::cout << "Local time:\t"  << ldt.local_time() << std::endl;
+				std::cout << "Time zone:\t"   << ldt.zone_as_posix_string() << std::endl;
+				std::cout << "Zone abbrev:\t" << ldt.zone_abbrev() << std::endl;
+				std::cout << "Zone offset:\t" << ldt.zone_abbrev(true) << std::endl;
+
+				local_date_time ldt2(not_a_date_time);
+				boost::posix_time::time_duration diff = *firstFrameTime - ldt;
+				std::cout << "Difference (h):\t" << diff.hours() << std::endl;
+				std::cout << "Difference (m):\t" << diff.minutes() << std::endl;
+				std::cout << "Difference (s):\t" << diff.total_seconds() << std::endl;
+				std::cout << "Difference (ms):" << diff.total_milliseconds() << std::endl;
+
 				// Add GPS coordinates
 				float coord[2] = {0};
 				coord[0] = atof(tokens[3].c_str());
@@ -149,6 +160,11 @@ namespace cs7495
 				GPScoord.push_back(coord);
 			}
 		}
-		delete input_facet;
+	};
+
+	int Extractor::findFirstTimeStamp()
+	{
+		//std::vector<local_date_time> diff(timestamps.size());
+		return 0;
 	};
 }

@@ -1,5 +1,9 @@
 #include "Image.h"
 #include "utils.h"
+#define BOOST_DATE_TIME_NO_LIB
+#include <boost/date_time/local_time/local_time.hpp>
+
+using namespace boost::local_time;
 
 namespace cs7495
 {
@@ -10,16 +14,18 @@ namespace cs7495
 	class Extractor
 	{
 	private:
-		std::vector<Image> frames;			///< Contains all the frames in the video
-		TimeStamp timestamp;				///< Reference time stamp (when recording started)
-		std::vector<std::string> timestamps;///< List of time stamps written as strings, e.g. "2013-10-19 17:32:43.537"
-		std::vector<float*> GPScoord;		///< List of GPS coordinates written as an array of two floating point numbers, e.g. {33.782714000, -84.395934000}
+		std::vector<Image> frames;				///< Contains all the frames in the video
+		local_date_time *firstFrameTime;		///< Reference time stamp (when recording started)
+		std::vector<local_date_time> timestamps;///< List of time stamps written as strings, e.g. "2013-10-19 17:32:43.537"
+		std::vector<float*> GPScoord;			///< List of GPS coordinates written as an array of two floating point numbers, e.g. {33.782714000, -84.395934000}
 
 	public:
 		/// <summary>
 		/// Default constructor.
 		/// </summary>
 		Extractor();
+
+		~Extractor();
 
 		/// <summary>
 		/// Extract all frames from a video file.

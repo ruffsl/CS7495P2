@@ -14,6 +14,10 @@ namespace cs7495
 	{
 		delete firstFrameTime;
 	};
+  
+        std::vector<float*> Extractor::getGPScoord() {
+	  return GPScoord;
+	}
 
 	//void Extractor::breakVideo(const std::string& filepath)
 	//{

@@ -27,7 +27,10 @@ namespace cs7495
 		/// </summary>
 		Extractor();
 
-		~Extractor();
+		~Extractor();	       
+		
+
+		std::vector<float*> getGPScoord();
 
 		/// <summary>
 		/// Extract all frames from a video file.

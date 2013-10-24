@@ -10,7 +10,7 @@ namespace cs7495
 	class Image : public cv::Mat
 	{
 	private:
-		float lattitude;						///< GPS lattitude
+		float latitude;							///< GPS latitude
 		float longitude;						///< GPS longitude
 		time_t timestamp;						///< Time stamp in seconds
 		std::vector<cv::KeyPoint> keyPoints;	///< SIFT point features
@@ -25,12 +25,12 @@ namespace cs7495
 		/// <summary>
 		/// Construct an image from file and separate data.
 		/// </summary>
-		Image(const std::string& filename, float lattitute = -1.0f, float longitude = -1.0f, time_t timestamp = -1, int flags = 1);
+		Image(const std::string& filename, float latitude = -1.0f, float longitude = -1.0f, time_t timestamp = -1, int flags = 1);
 
 		/// <summary>
 		/// Set GPS coordinates.
 		/// </summary>
-		/// <param name="lattitude">[in] GPS lattitude</param>
+		/// <param name="latitude">[in] GPS latitude</param>
 		/// <param name="longitude">[in] GPS longitude</param>
 		void setGPS(float lattitute, float longitude);
 

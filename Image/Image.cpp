@@ -5,13 +5,13 @@ namespace cs7495
 {
 	Image::Image() : cv::Mat()
 	{
-		lattitude = -1.0f;
+		latitude = -1.0f;
 		longitude = -1.0f;
 		timestamp = -1;
 	};
 
-	Image::Image(const std::string& filename, float lattitude, float longitude, time_t timestamp, int flags) :
-		lattitude(lattitude), longitude(longitude), timestamp(timestamp)
+	Image::Image(const std::string& filename, float latitude, float longitude, time_t timestamp, int flags) :
+		latitude(latitude), longitude(longitude), timestamp(timestamp)
 	{
 		cv::Mat tmp = cv::imread(filename, flags);
 		tmp.copyTo(*this);
@@ -19,7 +19,7 @@ namespace cs7495
 
 	void Image::setGPS(float lattitute, float longitude)
 	{
-		this->lattitude = lattitude;
+		this->latitude = latitude;
 		this->longitude = longitude;
 	};
 

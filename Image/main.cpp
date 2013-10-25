@@ -1,31 +1,34 @@
 #include "Extractor.h"
-#include "clustering.hpp"
 #include <iostream>
 
 using namespace cs7495;
 using namespace std;
 
-void Usage();
+void Usage(const char* prog);
 
 int main(int argc, char** argv)
 {
 	if (argc != 3)
-	  Usage();
+		Usage(argv[0]);
 
 	Extractor extractor;
+	// Get time stamp of the first frame
 	extractor.getTimeName(argv[argc-2]);
-	extractor.video2images(argv[argc-2]);
+	//extractor.video2images(argv[argc-2]);
+	// Extract <GPS coordinates, time stamp> pairs
 	extractor.readGeoData(argv[argc-1]);
-	
-        std::vector<float*> coord = extractor.getGPScoord();
-	for(int i = 0; i < coord.size(); i++) {
-	  cout << coord[i][0] << " " << coord[i][1] << endl;
+	// Find pair matching the first frame
+	extractor.findCorrespondingGPSCoords();
+	for (auto i : extractor.correspondingGPS)
+	{
+		printf("%f %f\n", i[0], i[1]);
 	}
+
 	return 0;
 }
 
-void Usage()
+void Usage(const char* prog)
 {
-	std::cout << "Usage: CS7495P2.exe <video file> <location file>" << std::endl;
+	cout << "Usage: " << prog << " <video file> <locations file>" << endl;
 	exit(1);
 };

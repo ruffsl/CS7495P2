@@ -103,7 +103,7 @@ double GaussianMixtureModel::evaluate(mat sample) {
   int k = this -> weights.size();
 
   for(int i = 0; i < k; i++) {
-    double p = lg(this -> weights[i]) + this -> components[i] -> evaluate(sample);
+    double p = lg(this -> weights[i]) + this -> components[i] -> evaluate(sample);  
     joint = lg_sum(joint, p);
   }
   return joint;
@@ -250,22 +250,33 @@ void GaussianMixtureModel::seed(vector<mat> samples) {
 }
 
 void GaussianMixtureModel::estimate(vector<mat> samples) {
+  //cout << "----------------------------NEW " << endl;
   seed(samples);
+  //cout << "/SEED" << endl;
+  //cout << samples.size() << " " << k() << endl;
   mat _expectation = zeros<mat>(samples.size(), k());   
+  //cout << "/EXP" << endl;
   double last_l = 1;
   for(int j = 0; j < EM_MAX_ITER; j++) {
+    //cout << "SCORING " << endl;
     double _score = score(samples);
+    
     if(std::isnan(_score)) {
       cout << "NaN" << endl;
       break;
     }
+    //cout << "em" << endl;
     expectation(samples, _expectation);
     maximization(samples, _expectation);
-
+    //cout << "/em" << endl;
+    //cout << "SCORE: " << _score << endl;
     if(convergence(_score, last_l)) {
+      cout << "CONVEGENCE" << endl;
       break;
     }
+    //cout << "/SCORE: " << _score << endl;
     last_l = _score;
+    cout << "----------------------------" << endl;
   }        
 
 }

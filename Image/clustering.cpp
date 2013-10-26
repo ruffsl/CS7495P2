@@ -58,6 +58,7 @@ GaussianMixtureModel clustering(vector<mat> data, int n_folds, int max_k, int pe
     cout << "FOLD: " << train.size() << " " << test.size() << endl;
 
     for(int k = 1; k < max_k; k++) {
+      cout << " --- " << k << endl;
       GaussianMixtureModel gmm(k);
       gmm.estimate(train);
       double ll = gmm.score(test);

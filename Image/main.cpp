@@ -1,8 +1,11 @@
+
 #include "Extractor.h"
 #include <iostream>
+#include "clustering.hpp"
 
 using namespace cs7495;
 using namespace std;
+using namespace arma;
 
 void Usage(const char* prog);
 
@@ -19,10 +22,22 @@ int main(int argc, char** argv)
 	extractor.readGeoData(argv[argc-1]);
 	// Find pair matching the first frame
 	extractor.findCorrespondingGPSCoords();
-	for (auto i : extractor.correspondingGPS)
+	
+	vector<int> responsabilities;
+	vector<mat> data;
+	for (vector<double> i : extractor.correspondingGPS)
 	{
-		printf("%f %f\n", i[0], i[1]);
+	  mat sample;
+	  sample << i[0] << i[1] << endr;
+	  cout << sample << endl;
+	  data.push_back(sample);
 	}
+	
+	GaussianMixtureModel gmm = clustering(data, 10, 4, PENALTY_BIC,
+					      responsabilities);
+
+	
+
 
 	return 0;
 }

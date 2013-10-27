@@ -1,94 +1,59 @@
 #include "clustering.hpp"
-#include "numerics.hpp"
-
-#include <stdlib.h>     /* srand, rand */
-#include <time.h>       /* time */
-#include <algorithm>    // std::find
-#include <iostream>
+#include <cstdlib>     /* srand, rand */
+#include <ctime>       /* time */
+#include <cmath>
+#include <cstdio>
 
 using namespace std;
 using namespace arma;
 
-/**
-   Monte Carlo Cross Validation creating one fold
- **/
-void mccv(vector<mat> data, double percentageTest, 
-	  vector<mat> &train,
-	  vector<mat> &test) {
-  train.clear();
-  test.clear();
-  vector<int> index;
-  int size =  data.size() * percentageTest;
-  for(int i = 0; i < size; i++) {
-    int num = rand() % data.size();
-    test.push_back(data[num]);
-    index.push_back(num);
-  }
+double dist(arma::mat x, arma::mat y) {
+  double R = 6371000; // km
 
-  for(int i = 0; i < data.size(); i++) {
-    if(find(index.begin(), index.end(), i) == index.end()) {
-      train.push_back(data[i]);
-    }
-  }
+  mat d = (x - y) * M_PI / 180;  
 
+  x = x * M_PI / 180;
+  y = y * M_PI / 180;
+
+  double a = sin(d(0,0)/2) * sin(d(0,0)) +
+    sin(d(0,1)/2) * sin(d(0,1)/2) * cos(x(0, 0)) * cos(y(0 ,0)); 
+  double c = 2 * atan2(sqrt(a), sqrt(1-a)); 
+  return R * c;
 }
 
-/**
-   Will cluster the data using a Gaussian Mixture Model,
-   the "right" k will be found using cross validation on 
-   likelihood or BIC
- **/
-GaussianMixtureModel clustering(vector<mat> data, int n_folds, int max_k, int penalty,
-				vector<int> responsability) {
+vector<mat> locations(double radius, vector<mat> points) {
   
-  double *avg_score_k       = new double[max_k];
-  double *max_score_k       = new double[max_k];
-  GaussianMixtureModel *max = new GaussianMixtureModel[max_k];
-
-  for(int i = 0; i < max_k; i++) {
-    avg_score_k[i] = 0;
-    max_score_k[i] = ZERO;
-  }
-  avg_score_k[0] = ZERO;
-
-  for(int i = 0; i < n_folds; i++) {
-    vector<mat> train;
-    vector<mat> test;
-    mccv(data, 0.5, train, test);    
-    cout << "FOLD: " << train.size() << " " << test.size() << endl;
-
-    for(int k = 1; k < max_k; k++) {
-      cout << " --- " << k << endl;
-      GaussianMixtureModel gmm(k);
-      gmm.estimate(train);
-      double ll = gmm.score(test);
-      if(penalty == PENALTY_BIC) {
-	ll -= ((k * 3) / 2) * lg(test.size());
-      }
-      cout << "    " << k << " " << ll << endl;
-      avg_score_k[k] += ll;
-      if(ll > max_score_k[k]){
-	max_score_k[k] = ll;
-	max[k] = gmm;
-      }
-    }    
-  }
-
-  double max_k_final = ZERO;
-  int k = -1;
-  for(int i = 1; i < max_k; i++) {
-    avg_score_k[i] /= n_folds;
-    cout << "i: " << avg_score_k[i] << endl;
-    if(avg_score_k[i] > max_k_final) {
-      max_k_final = avg_score_k[i];
-      k = i;
+  srand(time(0));
+  vector<mat> locations;
+  while(points.size() > 0) {
+    int center    = rand() % points.size();
+    mat location  = points[center];
+    mat _location = zeros(1, 2);
+    while(dist(location, _location) > 0) {
+      mat l = location; //zeros(1, 2);            
+      int num = 1;
+      for(int i = 0; i < points.size(); i++) {
+	double x = dist(location, points[i]);
+	if(x < radius) { 
+	  l += points[i];
+	  num++;
+	}
+      }      
+      l /= num;
+      printf("           %2.20f %2.20f %d\n", l(0, 0), l(0,1), num);
+      _location = location;
+      location = l;
     }
-  }
-  
-  for(int i = 0; i < data.size(); i++) {
-    responsability.push_back(max[k].argmax(data[i]));
+
+    vector<mat> _points;
+    for(int i = 0; i < points.size(); i++) {
+      if(dist(location, points[i]) >= radius) { 
+	  _points.push_back(points[i]);
+	}      
+    }
+    points = _points;
+    printf("L: %2.20f %2.20f\n", location(0, 0), location(0,1));
   }
 
-  return max[k];
+  return locations;
 }
-

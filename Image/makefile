@@ -1,7 +1,7 @@
 LIBS    = -lopencv_core -lopencv_nonfree -lopencv_features2d -lopencv_highgui -larmadillo
 CFLAGS  =  -g -std=c++11 
-CXX     = g++
-OBJ = Extractor.o Image.o utils.o clustering.o gmm.o numerics.o
+CXX     = clang++
+OBJ = Extractor.o Image.o utils.o clustering.o
 
 main : $(OBJ) 
 	$(CXX) $(CFLAGS) -o $ main main.cpp $(OBJ) $(LIBS)

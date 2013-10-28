@@ -35,33 +35,59 @@ namespace cs7495
 
 	void Extractor::video2images(const std::string& filepath)
 	{
+		cout << "Extractor::video2images(const std::string& filepath)" << endl;
+		// Time of frame
+		local_date_time frameTime = *firstFrameTime;
 		// Counter on the number of frames
 		int counter = 0;
 		// Open video file
 		cv::VideoCapture cap(filepath);
-		//cap.open(filepath);
 		// If successful
 		if (cap.isOpened())
 		{
 			// For all frames
 			while (true)
 			{
-				// Read next frame
+				// 1. Read next frame
 				Image tmp;
 				// If no next frame, then break
 				if (!cap.read(tmp)) break;
-				// Otherwise, save it
-				std::stringstream ss;
-				ss << "frame_" << counter << ".jpeg";
-				tmp.write(ss.str());
-				std::cout << "Writing " << ss << "..." << std::endl;
-				// Extract SIFT
+
+				// 2. Find corresponding time stamp and thus GPS coordinates
+				// Initialize to first
+				cout << "size of timestamps: " << (timestamps.empty() ? 0 : timestamps.size()) << endl;
+				boost::posix_time::time_duration duration = *firstFrameTime - timestamps[0];
+				cout << "long min = std::abs( duration.total_milliseconds() );" << endl;
+				long min = std::abs( duration.total_milliseconds() );
+				unsigned int index = 0;
+				// Iterate through all saved coordinates/time stamps
+				for (auto t : timestamps)
+				{
+					// Compute time difference
+					boost::posix_time::time_duration diff = frameTime - t;
+					// Memorize the smallest difference and the pair corresponding to it
+					if ( std::abs(diff.total_milliseconds()) < min)
+					{
+						min = diff.total_milliseconds();
+						index++;
+					}
+					// If the difference becomes <0 then we passed
+					// the pair we were looking for. stop
+					if ( diff.total_milliseconds() < 0 )
+						break;
+				}
+
+				// 4. Extract SIFT
 				tmp.computeSIFT();
-				// Save image overlayed with SIFT as well
-				Image sift = tmp.showSIFT();
-				std::stringstream sss;
-				sss << "frame_" << counter << "_sift.jpeg";
-				sift.write(sss.str());
+
+				// 5. Write to a text file
+				stringstream ss;
+				ss << counter << "_" << GPScoord[index][0] << "_" << GPScoord[index][1] << ".sift";
+				if (!tmp.writeSIFT2file(ss.str()))
+					cerr << "Error in Extractor::video2images(): could not open " << ss.str() << ". Skipping frame." << endl;
+
+				// Increment time of frame
+				frameTime += boost::posix_time::seconds(1);
 				// Increment counter
 				counter++;
 			}
@@ -112,7 +138,10 @@ namespace cs7495
 		// Open text file
 		std::ifstream myfile(filepath.c_str());
 		if (!myfile.is_open())
+		{
+			cerr << "Could not open " << filepath << endl;
 			return;
+		}
 
 		std::string line;
 		// Parse line by line
@@ -219,7 +248,7 @@ namespace cs7495
 					break;
 			}
 			// Return the index corresponding to the first frame
-			correspondingGPS.push_back(GPScoord[index]);
+			//correspondingGPS.push_back(GPScoord[index]);
 			// Increment time of frame
 			frameTime += boost::posix_time::seconds(1);
 			n++;

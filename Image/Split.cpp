@@ -1,6 +1,7 @@
 #include "Split.h"
 
 using namespace std;
+using namespace cs7495;
 
 void split(vector<Image> input, vector<Image> &test, vector<Image> &train) {
   test.clear();

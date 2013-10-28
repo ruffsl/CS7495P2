@@ -26,12 +26,10 @@ int main(int argc, char** argv)
 	Extractor extractor;
 	// Get time stamp of the first frame
 	extractor.getTimeName(argv[argc-2]);
-	//extractor.video2images(argv[argc-2]);
 	// Extract <GPS coordinates, time stamp> pairs
 	extractor.readGeoData(argv[argc-1]);
-	// Find pair matching the first frame
-	extractor.findCorrespondingGPSCoords();
-
+	// Extract frames, match GPS locations and write to file
+	extractor.video2images(argv[argc-2]);
 
 	Point2 x_initial(0.0, 0.0);
 	SharedDiagonal P_initial = 

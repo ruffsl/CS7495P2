@@ -19,7 +19,6 @@ namespace cs7495
 	  local_date_time *firstFrameTime;	///< Reference time stamp (when recording started)
 	  vector<local_date_time> timestamps;	///< List of time stamps written as strings, e.g. "2013-10-19 17:32:43.537"
 	  vector<vector<double> > GPScoord;	///< List of GPS coordinates written as an array of two floating point numbers, e.g. {33.782714000, -84.395934000}
-	  vector<vector<double> > correspondingGPS; 
 
 	public: unsigned int findFirstTimeStamp();
 

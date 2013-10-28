@@ -1,6 +1,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/nonfree/nonfree.hpp>
 
+using namespace std;
+
 namespace cs7495
 {
 	/// <summary>
@@ -13,7 +15,7 @@ namespace cs7495
 		float latitude;							///< GPS latitude
 		float longitude;						///< GPS longitude
 		time_t timestamp;						///< Time stamp in seconds
-		std::vector<cv::KeyPoint> keyPoints;	///< SIFT point features
+		vector<cv::KeyPoint> keyPoints;			///< SIFT point features
 		cv::Mat descriptors;					///< SIFT descriptors
 
 	public:
@@ -25,7 +27,7 @@ namespace cs7495
 		/// <summary>
 		/// Construct an image from file and separate data.
 		/// </summary>
-		Image(const std::string& filename, float latitude = -1.0f, float longitude = -1.0f, time_t timestamp = -1, int flags = 1);
+		Image(const string& filename, float latitude = -1.0f, float longitude = -1.0f, time_t timestamp = -1, int flags = 1);
 
 		/// <summary>
 		/// Set GPS coordinates.
@@ -47,6 +49,13 @@ namespace cs7495
 		void computeSIFT();
 
 		/// <summary>
+		/// Write SIFT key points to a text file.
+		/// </summary>
+		/// <param name="filename">[in] Path to the file to write</param>
+		/// <return>False if file could not be opened, true otherwise.</return>
+		bool writeSIFT2file(const string& filename) const;
+
+		/// <summary>
 		/// Return the image overlayed with its SIFT key points.
 		/// </summary>
 		/// <return>Image overlayed with SIFT key points</return>
@@ -55,7 +64,7 @@ namespace cs7495
 		/// <summary>
 		/// Wrap OpenCV's imwrite function.
 		/// </summary>
-		void write(const std::string& filename);
+		void write(const string& filename);
 	};
 
 }

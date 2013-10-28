@@ -4,6 +4,6 @@
 #include <vector>
 #include "Image.h"
 
-void split(std::vector<Image> input, std::vector<Image> &test, std::vector<Image> &train);
+void split(std::vector<cs7495::Image> input, std::vector<cs7495::Image> &test, std::vector<cs7495::Image> &train);
 
 #endif

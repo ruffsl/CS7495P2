@@ -1,5 +1,9 @@
 #include "Image.h"
 #include <opencv2/highgui/highgui.hpp>
+#include <fstream>
+#include <iostream>
+
+using namespace std;
 
 namespace cs7495
 {
@@ -10,7 +14,7 @@ namespace cs7495
 		timestamp = -1;
 	};
 
-	Image::Image(const std::string& filename, float latitude, float longitude, time_t timestamp, int flags) :
+	Image::Image(const string& filename, float latitude, float longitude, time_t timestamp, int flags) :
 		latitude(latitude), longitude(longitude), timestamp(timestamp)
 	{
 		cv::Mat tmp = cv::imread(filename, flags);
@@ -34,6 +38,37 @@ namespace cs7495
 		sift(*this, cv::Mat(), keyPoints, descriptors);
 	};
 
+	bool Image::writeSIFT2file(const string& filename) const
+	{
+		cout << "Image::writeSIFT2file(const string& filename)" << endl;
+		ofstream myfile(filename.c_str());
+		if (!myfile.is_open())
+			return false;
+
+		// Write the total number of key points followed
+		// by the size of a key point (128)
+		myfile << descriptors.rows << " " << descriptors.cols << endl;
+
+		// Write every key point
+		for (int i=0; i<descriptors.rows; i++)
+		{
+			// Write pixel location
+			myfile << keyPoints[i].pt.y << " " << keyPoints[i].pt.x << " ";
+			// Write scale and orientation
+			myfile << keyPoints[i].size << " " << keyPoints[i].angle << endl;
+			// Write descriptor
+			const float *p = descriptors.ptr<float>(i);
+			for (int j=0; j<descriptors.cols; j++)
+			{
+				myfile << p[j] << " ";
+			}
+			myfile << endl;
+		}
+		myfile.close();
+		return true;
+	};
+
+
 	Image Image::showSIFT()
 	{
 		Image out;
@@ -41,7 +76,7 @@ namespace cs7495
 		return out;
 	};
 
-	void Image::write(const std::string& filename)
+	void Image::write(const string& filename)
 	{
 		cv::imwrite(filename, *this);
 	};

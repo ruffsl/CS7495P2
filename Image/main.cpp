@@ -1,4 +1,4 @@
-
+#include <time.h>
 #include "Extractor.h"
 #include <iostream>
 #include "clustering.hpp"
@@ -17,12 +17,19 @@ using namespace gtsam;
 typedef Point2 LinearMeasurement;
 
 void Usage(const char* prog);
+void ConvertToHMS(float t, int* days, int* hours, int* minutes, float* seconds);
+void DisplayTime(float t);
 
 int main(int argc, char** argv)
 {
 	if (argc != 3)
 		Usage(argv[0]);
 
+	// Record time
+	time_t start_time = clock();
+
+	// Extract
+	cout << "Extracting GPS locations and SIFT features..." << endl;
 	Extractor extractor;
 	// Get time stamp of the first frame
 	extractor.getTimeName(argv[argc-2]);
@@ -30,6 +37,9 @@ int main(int argc, char** argv)
 	extractor.readGeoData(argv[argc-1]);
 	// Extract frames, match GPS locations and write to file
 	extractor.video2images(argv[argc-2]);
+
+	// Display time
+	DisplayTime( (clock()-start_time)/CLOCKS_PER_SEC );
 
 	Point2 x_initial(0.0, 0.0);
 	SharedDiagonal P_initial = 
@@ -44,7 +54,7 @@ int main(int argc, char** argv)
 	vector<int> responsabilities;
 	vector<mat> data;
 	int t = 0;
-	for (vector<double> i : extractor.GPScoord) {
+	for (vector<double> i : extractor.getGPScoord()) {
 	  mat sample;
 	  sample << i[0] << i[1] << endr;
 	  if(data.size() > 0) {
@@ -68,10 +78,43 @@ int main(int argc, char** argv)
 
 	locations(100, data);
 	return 0;
-}
+};
 
 void Usage(const char* prog)
 {
 	cout << "Usage: " << prog << " <video file> <locations file>" << endl;
 	exit(1);
 };
+
+void ConvertToHMS(float t, int* days, int* hours, int* minutes, float* seconds)
+{
+	*days = (int) floor(t/(3600.0*24.0));
+	*hours = (int) floor(t/3600.0 - (*days)*24.0);
+	*minutes = (int) floor( t/60.0 - ((*days)*24.0 + (*hours))*60.0);
+	*seconds = t - ((*days)*3600.0*24.0 + (*hours)*3600.0 + (*minutes)*60.0);
+};
+
+void DisplayTime(float t)
+{
+	int days, hours, minutes;
+	float seconds;
+	ConvertToHMS(t, &days, &hours, &minutes, &seconds);
+	cout << "Done in ";
+	if (days > 0)
+	{
+		cout << days << "d " << hours << "h " << minutes << "m " << seconds << "s." << endl;
+	}
+	else if (hours > 0)
+	{
+		cout << hours << "h " << minutes << "m " << seconds << "s." << endl;
+	}
+	else if (minutes > 0)
+	{
+		cout << minutes << "m " << seconds << "s." << endl;
+	}
+	else
+	{
+		cout << t << " seconds." << endl;
+	}
+};
+

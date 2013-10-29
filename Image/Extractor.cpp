@@ -2,9 +2,20 @@
 #include <opencv2/opencv.hpp>
 #include <fstream>
 #include <string>
+#include <limits>
+
+typedef std::numeric_limits<double> dbl;
+
+#define DEBUG
 
 namespace cs7495
 {
+	vector<vector<double> > Extractor::getGPScoord() const
+	{
+		if (GPScoord.empty()) cout << "Warning: No GPS coordinates on record!" << endl;
+		return GPScoord;
+	};
+
 	Extractor::Extractor()
 	{
 		firstFrameTime = new local_date_time(not_a_date_time);
@@ -22,6 +33,10 @@ namespace cs7495
 			cerr << "Error: No GPS locations and time stamps on record! Aborting reading video..." << endl;
 			return;
 		}
+#ifdef DEBUG
+		ofstream debug_log("debug_log_video2images.txt");
+		debug_log.precision(dbl::digits10);
+#endif
 		// Time of first frame
 		local_date_time frameTime = *firstFrameTime;
 		// Counter on the number of frames
@@ -31,7 +46,7 @@ namespace cs7495
 		// If successful
 		if (cap.isOpened())
 		{
-			cout << "Reading every frame of " << filepath << endl;
+			cout << "Reading every frame of " << filepath << " and saving SIFT and GPS data..." << endl;
 			// For all frames
 			while (true)
 			{
@@ -51,7 +66,7 @@ namespace cs7495
 					// Compute time difference
 					boost::posix_time::time_duration diff = frameTime - t;
 					// Memorize the smallest difference and the pair corresponding to it
-					if ( std::abs(diff.total_milliseconds()) < min)
+					if ( abs(diff.total_milliseconds()) < min)
 					{
 						min = diff.total_milliseconds();
 						index++;
@@ -61,16 +76,25 @@ namespace cs7495
 					if ( diff.total_milliseconds() < 0 )
 						break;
 				}
+				tmp.setGPS(GPScoord[index][0], GPScoord[index][1]);
+//				tmp.setTimeStamp(timestamps[index]);
 
 				// 4. Extract SIFT
 				tmp.computeSIFT();
+				stringstream st;
+				st << counter << "_sift.jpg";
+				tmp.showSIFT().write(st.str());
 
 				// 5. Write to a text file
 				stringstream ss;
-				ss << counter << "_" << GPScoord[index][0] << "_" << GPScoord[index][1] << ".sift";
+				ss.precision(dbl::digits10);
+				ss << counter << "_" << fixed << GPScoord[index][0] << "_" << GPScoord[index][1] << ".sift";
 				if (!tmp.writeSIFT2file(ss.str()))
 					cerr << "Error in Extractor::video2images(): could not open " << ss.str() << ". Skipping frame." << endl;
 
+#ifdef DEBUG
+				debug_log << "Time: " << frameTime.local_time() << ", GPS: " << fixed << GPScoord[index][0] << ", " << GPScoord[index][1] << endl;
+#endif
 				// Increment time of frame
 				frameTime += boost::posix_time::seconds(1);
 				// Increment counter
@@ -82,6 +106,9 @@ namespace cs7495
 		{
 			cerr << "Error: could not open " << filepath << endl;
 		}
+#ifdef DEBUG
+		debug_log.close();
+#endif
 	};
 
 	void Extractor::getTimeName(const string& filepath)
@@ -114,6 +141,10 @@ namespace cs7495
 
 	void Extractor::readGeoData(const string& filepath)
 	{
+#ifdef DEBUG
+		ofstream debug_log("debug_log_readGeoData.txt");
+		debug_log.precision(dbl::digits10);
+#endif
 		// Open text file
 		ifstream myfile(filepath.c_str());
 		if (!myfile.is_open())
@@ -138,13 +169,22 @@ namespace cs7495
 				string timestamp = "";
 				timestamp += tokens[1] + " " + tokens[2] + " UTC+4";
 				// Set up the input datetime format.
-				local_time_input_facet *input_facet = new local_time_input_facet("%Y-%m-%d %H:%M:%S%f %ZP");
+				string format = "%Y-%m-%d %H:%M:%S%f %ZP";
+				if (split(tokens[2], '.').size() < 2)
+					format = "%Y-%m-%d %H:%M:%S %ZP";
+				local_time_input_facet *input_facet = new local_time_input_facet(format.c_str());
 				// Read time
-				std::stringstream ss;
+				stringstream ss;
 				ss.imbue(std::locale(ss.getloc(), input_facet));
 				local_date_time ldt(not_a_date_time);
 				ss.str(timestamp);
 				ss >> ldt;
+				if (ldt.is_not_a_date_time())
+				{
+					cout << "Warning: " << ss << " could not be read correctly." << endl;
+					cout << "\tFormat is " << format << endl;
+					cout << "\tDate: " << tokens[2] << endl;
+				}
 				// Insert boost local_time into list
 				timestamps.push_back(ldt);
 
@@ -153,7 +193,13 @@ namespace cs7495
 				coord.push_back(atof(tokens[3].c_str()));
 				coord.push_back(atof(tokens[4].c_str()));
 				GPScoord.push_back(coord);
+#ifdef DEBUG
+				debug_log << "Time: " << ldt.local_time() << ", GPS: " << fixed << coord[0] << ", " << coord[1] << endl;
+#endif
 			}
 		}
+#ifdef DEBUG
+		debug_log.close();
+#endif
 	};
 }

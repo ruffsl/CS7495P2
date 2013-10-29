@@ -1,5 +1,6 @@
 #include "Image.h"
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <fstream>
 #include <iostream>
 
@@ -11,36 +12,47 @@ namespace cs7495
 	{
 		latitude = -1.0f;
 		longitude = -1.0f;
-		timestamp = -1;
+		timestamp = "";
 	};
 
-	Image::Image(const string& filename, float latitude, float longitude, time_t timestamp, int flags) :
+	Image::Image(double latitude, double longitude, string& timestamp) : cv::Mat()
+	{
+		this->latitude = latitude;
+		this->longitude = longitude;
+		this->timestamp = timestamp;
+	};
+
+	Image::Image(const string& filename, double latitude, double longitude, string timestamp, int flags) :
 		latitude(latitude), longitude(longitude), timestamp(timestamp)
 	{
 		cv::Mat tmp = cv::imread(filename, flags);
 		tmp.copyTo(*this);
 	};
 
-	void Image::setGPS(float lattitute, float longitude)
+	void Image::setGPS(double lattitute, double longitude)
 	{
 		this->latitude = latitude;
 		this->longitude = longitude;
 	};
 
-	void Image::setTimeStamp(time_t timestamp)
+	void Image::setTimeStamp(string& timestamp)
 	{
 		this->timestamp = timestamp;
 	};
 
 	void Image::computeSIFT()
 	{
-		cv::SIFT sift;
+		// Resize
+		Image tmp(latitude, longitude, timestamp);
+		cv::resize(*this, tmp, cv::Size(), 0.5, 0.5, CV_INTER_AREA);
+		tmp.copyTo(*this);
+		// Compute SIFT
+		cv::SIFT sift(0, 3, .1);
 		sift(*this, cv::Mat(), keyPoints, descriptors);
 	};
 
 	bool Image::writeSIFT2file(const string& filename) const
 	{
-		cout << "Image::writeSIFT2file(const string& filename)" << endl;
 		ofstream myfile(filename.c_str());
 		if (!myfile.is_open())
 			return false;

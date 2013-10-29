@@ -28,6 +28,11 @@ namespace cs7495
 		~Extractor();
 
 		/// <summary>
+		/// Getter for GPScoord.
+		/// </summary>
+		vector<vector<double> > getGPScoord() const;
+
+		/// <summary>
 		/// Extract each frame, find the correspond GPS location
 		/// from its time stamp and save SIFT key points to a
 		/// formatted text file.

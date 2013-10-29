@@ -67,7 +67,7 @@ namespace cs7495
 			// Write pixel location
 			myfile << keyPoints[i].pt.y << " " << keyPoints[i].pt.x << " ";
 			// Write scale and orientation
-			myfile << keyPoints[i].size << " " << keyPoints[i].angle << endl;
+			myfile << keyPoints[i].size << " " << keyPoints[i].angle << " ";
 			// Write descriptor
 			const float *p = descriptors.ptr<float>(i);
 			for (int j=0; j<descriptors.cols; j++)

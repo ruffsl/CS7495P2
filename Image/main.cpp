@@ -31,12 +31,7 @@ int main(int argc, char** argv)
 	// Extract
 	cout << "Extracting GPS locations and SIFT features..." << endl;
 	Extractor extractor;
-	// Get time stamp of the first frame
-	extractor.getTimeName(argv[argc-2]);
-	// Extract <GPS coordinates, time stamp> pairs
-	extractor.readGeoData(argv[argc-1]);
-	// Extract frames, match GPS locations and write to file
-	extractor.video2images(argv[argc-2]);
+	extractor.extract(argv[argc-2], argv[argc-1], "list.in");
 
 	// Display time
 	DisplayTime( (clock()-start_time)/CLOCKS_PER_SEC );

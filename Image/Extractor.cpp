@@ -6,7 +6,7 @@
 
 typedef std::numeric_limits<double> dbl;
 
-#define DEBUG
+//#define DEBUG
 
 namespace cs7495
 {
@@ -26,7 +26,7 @@ namespace cs7495
 		delete firstFrameTime;
 	};
 
-	void Extractor::video2images(const string& filepath)
+	void Extractor::video2images(const string& filepath, ofstream& list)
 	{
 		if (timestamps.empty())
 		{
@@ -81,9 +81,11 @@ namespace cs7495
 
 				// 4. Extract SIFT
 				tmp.computeSIFT();
+#ifdef DEBUG
 				stringstream st;
 				st << counter << "_sift.jpg";
 				tmp.showSIFT().write(st.str());
+#endif
 
 				// 5. Write to a text file
 				stringstream ss;
@@ -91,7 +93,7 @@ namespace cs7495
 				ss << counter << "_" << fixed << GPScoord[index][0] << "_" << GPScoord[index][1] << ".sift";
 				if (!tmp.writeSIFT2file(ss.str()))
 					cerr << "Error in Extractor::video2images(): could not open " << ss.str() << ". Skipping frame." << endl;
-
+				list << ss.str() << endl;
 #ifdef DEBUG
 				debug_log << "Time: " << frameTime.local_time() << ", GPS: " << fixed << GPScoord[index][0] << ", " << GPScoord[index][1] << endl;
 #endif
@@ -201,5 +203,22 @@ namespace cs7495
 #ifdef DEBUG
 		debug_log.close();
 #endif
+	};
+
+	void Extractor::extract(const string& videopath, const string& kmlpath, const string& filepath)
+	{
+		// Get time stamp of the first frame
+		getTimeName(videopath);
+		// Extract <GPS coordinates, time stamp> pairs
+		readGeoData(kmlpath);
+		ofstream list(filepath);
+		if (!list.is_open())
+		{
+			cerr << "Error in Extractor::extract(): could not open " << filepath << endl;
+			return;
+		}
+		// Extract frames, match GPS locations and write to file
+		video2images(videopath, list);
+		list.close();
 	};
 }

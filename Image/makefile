@@ -3,6 +3,9 @@ CFLAGS  =  -g
 CXX     = clang++
 OBJ = Extractor.o Image.o utils.o clustering.o
 
+kalman_tool: $(OBJ)
+	$(CXX) $(CFLAGS) -o kalman_tool kalman_tool.cpp $(OBJ) $(LIBS)
+
 clustertool: $(OBJ)
 	$(CXX) $(CFLAGS) -o clustertool clustertool.cpp $(OBJ) $(LIBS)
 

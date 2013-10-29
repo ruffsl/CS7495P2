@@ -26,7 +26,7 @@ namespace cs7495
 		delete firstFrameTime;
 	};
 
-	void Extractor::video2images(const string& filepath, ofstream& list)
+        void Extractor::video2images(const string& filepath, ofstream& list)
 	{
 		if (timestamps.empty())
 		{
@@ -46,7 +46,7 @@ namespace cs7495
 		// If successful
 		if (cap.isOpened())
 		{
-			cout << "Reading every frame of " << filepath << " and saving SIFT and GPS data..." << endl;
+		  //cout << "Reading every frame of " << filepath << " and saving SIFT and GPS data..." << endl;
 			// For all frames
 			while (true)
 			{
@@ -154,7 +154,7 @@ namespace cs7495
 			cerr << "Could not open " << filepath << endl;
 			return;
 		}
-		cout << "Parsing " << filepath << " for time stamps and GPS locations." << endl;
+		// cout << "Parsing " << filepath << " for time stamps and GPS locations." << endl;
 		string line;
 		// Parse line by line
 		while ( getline(myfile, line) )
@@ -211,7 +211,7 @@ namespace cs7495
 		getTimeName(videopath);
 		// Extract <GPS coordinates, time stamp> pairs
 		readGeoData(kmlpath);
-		ofstream list(filepath);
+		ofstream list(filepath.c_str());
 		if (!list.is_open())
 		{
 			cerr << "Error in Extractor::extract(): could not open " << filepath << endl;

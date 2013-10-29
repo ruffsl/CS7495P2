@@ -40,7 +40,7 @@ vector<mat> locations(double radius, vector<mat> points) {
 	}
       }      
       l /= num;
-      printf("           %2.20f %2.20f %d\n", l(0, 0), l(0,1), num);
+      // printf("           %2.20f %2.20f %d\n", l(0, 0), l(0,1), num);
       _location = location;
       location = l;
     }
@@ -52,7 +52,8 @@ vector<mat> locations(double radius, vector<mat> points) {
 	}      
     }
     points = _points;
-    printf("L: %2.20f %2.20f\n", location(0, 0), location(0,1));
+    locations.push_back(location);
+    // printf("L: %2.20f %2.20f\n", location(0, 0), location(0,1));
   }
 
   return locations;

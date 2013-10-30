@@ -25,7 +25,7 @@ class Extractor
 	/// formatted text file.
 	/// </summary>
 	/// <param name="filepath">[in] Path to the video file</param>
-	void video2images(const string& filepath, ofstream& list);
+	void video2images(const string& filepath, ofstream& list, bool sift_jpeg = false);
 
 
 	/// <summary>

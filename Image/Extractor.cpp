@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <limits>
+#include <boost/filesystem/operations.hpp>
 
 typedef std::numeric_limits<double> dbl;
 
@@ -26,8 +27,9 @@ namespace cs7495
 		delete firstFrameTime;
 	};
 
-        void Extractor::video2images(const string& filepath, ofstream& list)
+    void Extractor::video2images(const string& filepath, ofstream& list, bool sift_jpeg)
 	{
+    	cout << "Creating .sift files for each frame..." << endl;
 		if (timestamps.empty())
 		{
 			cerr << "Error: No GPS locations and time stamps on record! Aborting reading video..." << endl;
@@ -50,6 +52,7 @@ namespace cs7495
 			// For all frames
 			while (true)
 			{
+				cout << "\r" << counter << " frames treated.        " << flush;
 				// 1. Read next frame
 				Image tmp;
 				// If no next frame, then break
@@ -79,20 +82,27 @@ namespace cs7495
 				tmp.setGPS(GPScoord[index][0], GPScoord[index][1]);
 //				tmp.setTimeStamp(timestamps[index]);
 
-				// 4. Extract SIFT
-				tmp.computeSIFT();
-#ifdef DEBUG
-				stringstream st;
-				st << counter << "_sift.jpg";
-				tmp.showSIFT().write(st.str());
-#endif
+				// 4. Create sub directory
+				vector<string> tok = split(filepath, '/');
+				tok = split(tok[tok.size()-1], '.');
+				boost::filesystem::path subdir(tok[0].c_str());
+				boost::filesystem::create_directory(subdir);
 
-				// 5. Write to a text file
+				// 5. Extract SIFT
+				tmp.computeSIFT();
+				if (sift_jpeg)
+				{
+					stringstream st;
+					st << tok[0] << "/" << tok[0] << "_" << counter << "_sift.jpg";
+					tmp.showSIFT().write(st.str());
+				}
+
+				// 6. Write to a text file
 				stringstream ss;
 				ss.precision(dbl::digits10);
-				ss << counter << "_" << fixed << GPScoord[index][0] << "_" << GPScoord[index][1] << ".sift";
+				ss << tok[0] << "/" << tok[0] << "_" << counter << "_" << fixed << GPScoord[index][0] << "_" << GPScoord[index][1] << ".sift";
 				if (!tmp.writeSIFT2file(ss.str()))
-					cerr << "Error in Extractor::video2images(): could not open " << ss.str() << ". Skipping frame." << endl;
+					cerr << "\nError in Extractor::video2images(): could not open " << ss.str() << ". Skipping frame." << endl;
 				list << ss.str() << endl;
 #ifdef DEBUG
 				debug_log << "Time: " << frameTime.local_time() << ", GPS: " << fixed << GPScoord[index][0] << ", " << GPScoord[index][1] << endl;

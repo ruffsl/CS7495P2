@@ -1,7 +1,10 @@
 LIBS    = -lopencv_core -lopencv_nonfree -lopencv_features2d -lopencv_highgui -larmadillo -lgtsam -lboost_system -lopencv_imgproc -lboost_filesystem
-CFLAGS  =  -g 
+CFLAGS  =  -g -std=c++11 -static-libstdc++ 
 CXX     = clang++
 OBJ = Extractor.o Image.o utils.o clustering.o
+
+kalman_tool2: $(OBJ)
+	$(CXX) $(CFLAGS) -o kalman_tool2 kalman_tool2.cpp $(OBJ) $(LIBS)
 
 kalman_tool: $(OBJ)
 	$(CXX) $(CFLAGS) -o kalman_tool kalman_tool.cpp $(OBJ) $(LIBS)

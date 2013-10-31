@@ -1,4 +1,4 @@
-LIBS    = -lopencv_core -lopencv_nonfree -lopencv_features2d -lopencv_highgui -larmadillo -lgtsam -lboost_system -lopencv_imgproc
+LIBS    = -lopencv_core -lopencv_nonfree -lopencv_features2d -lopencv_highgui -larmadillo -lgtsam -lboost_system -lopencv_imgproc -lboost_filesystem
 CFLAGS  =  -g 
 CXX     = clang++
 OBJ = Extractor.o Image.o utils.o clustering.o

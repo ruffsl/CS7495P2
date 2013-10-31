@@ -66,9 +66,9 @@
  */
 unsigned char *ReadKeys(const char *keyfile, int dim, int &num_keys_out)
 {
-    short int *keys;
+    unsigned char *keys;
     keypt_t *info = NULL;
-    int num_keys = ReadKeyFile(keyfile, &keys, &info);
+    int num_keys = ReadKeyFileCXX(keyfile, &keys, &info);
     
     unsigned char *keys_char = new unsigned char[num_keys * dim];
         

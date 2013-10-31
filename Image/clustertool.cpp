@@ -22,8 +22,6 @@ int main(int argc, char **argv) {
      data.push_back(sample);
   }
   vector<mat> clusters = locations(100, data);
-  for(int i = 0; i < clusters.size(); i++) {
-    printf("L: %2.20f %2.20f\n", clusters[i](0, 0), clusters[i](0,1));
-  }
+  
   return 0;
 }

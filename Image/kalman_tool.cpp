@@ -57,8 +57,8 @@ int main(int argc, char** argv) {
 	  mat pred, obs;
 	  pred << x_predict.x() << x_predict.y() << endr;
 	  obs << i[0] << i[1] << endr;	  
-	  cout << "ERR: " << dist(pred, obs) << endl;
-	  // x_predict.print("X Predict: ");
+	  //cout << "ERR: " << dist(pred, obs) << endl;
+	  //x_predict.print("X Predict: ");
 	  t++;
 	}
 	return 0;

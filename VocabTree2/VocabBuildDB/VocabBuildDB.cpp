@@ -51,9 +51,9 @@ unsigned char *ReadAndFilterKeys(const char *keyfile, int dim,
                                  double min_feature_scale, 
                                  int max_keys, int &num_keys_out)
 {
-    short int *keys;
+  unsigned char *keys;
     keypt_t *info = NULL;
-    int num_keys = ReadKeyFile(keyfile, &keys, &info);
+    int num_keys = ReadKeyFileCXX(keyfile, &keys, &info);
     
     if (num_keys == 0) {
         num_keys_out = 0;

@@ -44,17 +44,19 @@ vector<mat> locations(double radius, vector<mat> points) {
       _location = location;
       location = l;
     }
-
+    printf("L: %2.20f %2.20f\n", location(0, 0), location(0,1));
     vector<mat> _points;
     for(int i = 0; i < points.size(); i++) {
       if(dist(location, points[i]) >= radius) { 
 	  _points.push_back(points[i]);
-	}      
+      } else {
+	printf(" - %2.20f %2.20f\n", points[i](0, 0), points[i](0,1));
+      }
     }
     points = _points;
     locations.push_back(location);
-    // printf("L: %2.20f %2.20f\n", location(0, 0), location(0,1));
+    
   }
-
+  
   return locations;
 }

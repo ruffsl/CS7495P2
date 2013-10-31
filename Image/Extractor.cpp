@@ -49,10 +49,10 @@ namespace cs7495
 		}
 		ofstream file(filepath.c_str());
 		if (!file.is_open())
-		{
-			cerr << "Error in Extractor::writeInfoToTxt(): Could not open " << filepath << "! Aborting writing to text file..." << endl;
-			return;
-		}
+		  {
+		    cerr << "Error in Extractor::writeInfoToTxt(): Could not open " << filepath << "! Aborting writing to text file..." << endl;
+		    return;
+		  }
 		cout << "Writing info for " << frames.size() << " frames to " << filepath << endl;
 		for (auto i : frames)
 		{
@@ -90,6 +90,7 @@ namespace cs7495
 			gps.push_back(atof(tokens[2].c_str()));
 			gps.push_back(atof(tokens[3].c_str()));
 			info.GPScoord = gps;
+			frames.push_back(info);
 		}
 	};
 

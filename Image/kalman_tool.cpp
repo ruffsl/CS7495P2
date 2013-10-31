@@ -19,8 +19,51 @@ typedef Point2 LinearMeasurement;
 int main(int argc, char** argv) {
 
 	// Record time
-	time_t start_time = clock();
+	time_t start_time = clock(); 
+	
+	ifstream myReadFile;
+	myReadFile.open(argv[1]);
+	char output[100];
+	int file = 1;
+	double total = 0;
+	if (myReadFile.is_open()) {	  
+	  double cur[4];
+	  int num = 0;
+	  mat last_x;
+	  last_x << 0 << 0 << endr;
+	  while (!myReadFile.eof()) {
+	    
+	    
+	    myReadFile >> output;
+	    double val = atof(output);
+	    
+	    cur[num] = val;
+	    
+	    if(num == 3) {
+	      mat x, y;
 
+	      x << cur[0] << cur[1] << endr;
+	      y << cur[2] << cur[3] << endr;
+
+	      double d = dist(x, y);
+	      cout << x;
+	      cout << y;
+	      cout << d << " IN " << file << endl;
+	      last_x = y;
+	      total += d;
+	      num = 0;
+	      file++;
+	    } else  {	    
+	      num++;
+	    }
+	  }
+	  
+	}
+	myReadFile.close();
+	cout << "TOTAL ERROR: " << total << endl;
+	
+
+	/**
 	// Extract
 	cout << "Extracting GPS locations and SIFT features..." << endl;
 	Extractor extractor;
@@ -61,6 +104,7 @@ int main(int argc, char** argv) {
 	  //x_predict.print("X Predict: ");
 	  t++;
 	}
+	**/
 	return 0;
 };
 

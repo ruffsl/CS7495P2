@@ -1,3 +1,6 @@
+#ifndef _EX__
+#define _EX__
+
 #include "Image.h"
 #include "utils.h"
 #define BOOST_DATE_TIME_NO_LIB
@@ -8,6 +11,7 @@ using namespace std;
 
 namespace cs7495
 {
+
 struct ImgInfo {
 	vector<double> GPScoord;
 	string pathToSIFTfile;
@@ -78,3 +82,5 @@ public:
 	void extract(const string& videopath, const string& kmlpath, const string& filepath, bool sift_jpeg = false);
 };
 }
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef _IMG__
+#define _IMG__
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/nonfree/nonfree.hpp>
 //#define BOOST_DATE_TIME_NO_LIB
@@ -73,3 +76,5 @@ namespace cs7495
 	};
 
 }
+
+#endif

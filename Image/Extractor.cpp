@@ -4,6 +4,7 @@
 #include <string>
 #include <limits>
 #include <boost/filesystem/operations.hpp>
+//#include <boost/tokenizer.hpp>
 
 typedef std::numeric_limits<double> dbl;
 
@@ -17,14 +18,79 @@ namespace cs7495
 		return GPScoord;
 	};
 
+	vector<ImgInfo> Extractor::getImgInfo() const
+	{
+		if (frames.empty()) cout << "Warning: No info about frames on record!" << endl;
+		return frames;
+	};
+
+	string Extractor::getVideoName() const
+	{
+		return videoName;
+	};
+
 	Extractor::Extractor()
 	{
 		firstFrameTime = new local_date_time(not_a_date_time);
+		videoName = "";
 	};
 
 	Extractor::~Extractor()
 	{
 		delete firstFrameTime;
+	};
+
+	void Extractor::writeInfoToTxt(const string& filepath) const
+	{
+		if (frames.empty())
+		{
+			cerr << "Error in Extractor::writeInfoToTxt(): No frame info on record! Aborting writing to text file..." << endl;
+			return;
+		}
+		ofstream file(filepath.c_str());
+		if (!file.is_open())
+		{
+			cerr << "Error in Extractor::writeInfoToTxt(): Could not open " << filepath << "! Aborting writing to text file..." << endl;
+			return;
+		}
+		cout << "Writing info for " << frames.size() << " frames to " << filepath << endl;
+		for (auto i : frames)
+		{
+			file.precision(20);
+			file << i.index << " " << i.pathToSIFTfile << " " << fixed << i.GPScoord[0] << " " << i.GPScoord[1] << endl;
+		}
+		file.close();
+	};
+
+	void Extractor::readInfoFromTxt(const string& filepath)
+	{
+		ifstream file(filepath.c_str());
+		if (!file.is_open())
+		{
+			cerr << "Error in Extractor::readInfoFromTxt(): Could not open file " << filepath << ". Aborting reading..." << endl;
+			return;
+		}
+		if (!frames.empty())
+		{
+			cout << "Warning in Extractor::readInfoFromTxt(): Vector of info about frames is not empty. Overwriting..." << endl;
+		}
+		frames.clear();
+		string line;
+		while (getline(file, line))
+		{
+			vector<string> tokens = split(line, ' ');
+			if (tokens.size() != 4) {
+				cerr << "Error tokenizing the following line:\n\t" << line << endl;
+				continue;
+			}
+			ImgInfo info;
+			info.index = atoi(tokens[0].c_str());
+			info.pathToSIFTfile = tokens[1];
+			vector<double> gps;
+			gps.push_back(atof(tokens[2].c_str()));
+			gps.push_back(atof(tokens[3].c_str()));
+			info.GPScoord = gps;
+		}
 	};
 
     void Extractor::video2images(const string& filepath, ofstream& list, bool sift_jpeg)
@@ -39,6 +105,10 @@ namespace cs7495
 		ofstream debug_log("debug_log_video2images.txt");
 		debug_log.precision(dbl::digits10);
 #endif
+		// Video name
+		vector<string> toktok = split(filepath, '/');
+		toktok = split(toktok[toktok.size()-1], '.');
+		videoName = toktok[0];
 		// Time of first frame
 		local_date_time frameTime = *firstFrameTime;
 		// Counter on the number of frames
@@ -83,36 +153,48 @@ namespace cs7495
 //				tmp.setTimeStamp(timestamps[index]);
 
 				// 4. Create sub directory
-				vector<string> tok = split(filepath, '/');
-				tok = split(tok[tok.size()-1], '.');
-				boost::filesystem::path subdir(tok[0].c_str());
+				boost::filesystem::path subdir(videoName.c_str());
 				boost::filesystem::create_directory(subdir);
+				if (sift_jpeg)
+				{
+					boost::filesystem::path subdir_frames((videoName + "_frames").c_str());
+					boost::filesystem::create_directory(subdir_frames);
+				}
 
 				// 5. Extract SIFT
-				tmp.computeSIFT();
+//				tmp.computeSIFT();
 				if (sift_jpeg)
 				{
 					stringstream st;
-					st << tok[0] << "/" << tok[0] << "_" << counter << "_sift.jpg";
+					st << videoName << "_frames" << "/" << videoName << "_" << counter << "_sift.jpg";
 					tmp.showSIFT().write(st.str());
 				}
 
 				// 6. Write to a text file
 				stringstream ss;
 				ss.precision(dbl::digits10);
-				ss << tok[0] << "/" << tok[0] << "_" << counter << "_" << fixed << GPScoord[index][0] << "_" << GPScoord[index][1] << ".sift";
-				if (!tmp.writeSIFT2file(ss.str()))
-					cerr << "\nError in Extractor::video2images(): could not open " << ss.str() << ". Skipping frame." << endl;
+				ss << videoName << "/" << videoName << "_" << counter << "_" << fixed << GPScoord[index][0] << "_" << GPScoord[index][1] << ".sift";
+//				if (!tmp.writeSIFT2file(ss.str()))
+//					cerr << "\nError in Extractor::video2images(): could not open " << ss.str() << ". Skipping frame." << endl;
 				list << ss.str() << endl;
 #ifdef DEBUG
 				debug_log << "Time: " << frameTime.local_time() << ", GPS: " << fixed << GPScoord[index][0] << ", " << GPScoord[index][1] << endl;
 #endif
-				// Increment time of frame
+
+				// 7. Add info to list of frames
+				ImgInfo info;
+				info.GPScoord = GPScoord[index];
+				info.pathToSIFTfile = ss.str();
+				info.index = counter;
+				frames.push_back(info);
+
+				// 8. Increment time of frame
 				frameTime += boost::posix_time::seconds(1);
 				// Increment counter
 				counter++;
 			}
 			cap.release();
+			cout << endl;
 		}
 		else
 		{
@@ -209,13 +291,19 @@ namespace cs7495
 				debug_log << "Time: " << ldt.local_time() << ", GPS: " << fixed << coord[0] << ", " << coord[1] << endl;
 #endif
 			}
+#ifdef DEBUG
+			else
+			{
+				cout << "tokens[0]=" << tokens[0] << endl;;
+			}
+#endif
 		}
 #ifdef DEBUG
 		debug_log.close();
 #endif
 	};
 
-	void Extractor::extract(const string& videopath, const string& kmlpath, const string& filepath)
+	void Extractor::extract(const string& videopath, const string& kmlpath, const string& filepath, bool sift_jpeg)
 	{
 		// Get time stamp of the first frame
 		getTimeName(videopath);
@@ -228,7 +316,7 @@ namespace cs7495
 			return;
 		}
 		// Extract frames, match GPS locations and write to file
-		video2images(videopath, list);
+		video2images(videopath, list, sift_jpeg);
 		list.close();
 	};
 }

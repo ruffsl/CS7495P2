@@ -22,8 +22,18 @@ void DisplayTime(float t);
 
 int main(int argc, char** argv)
 {
-	if (argc != 3)
+	if (argc < 3)
 		Usage(argv[0]);
+
+	bool sift_jpeg = false;
+	if (argc == 4)
+	{
+		if (argv[3][0] == '1')
+		{
+			sift_jpeg = true;
+			cout << "Will save frames as JPEG files." << endl;
+		}
+	}
 
 	// Record time
 	time_t start_time = clock();
@@ -31,10 +41,13 @@ int main(int argc, char** argv)
 	// Extract
 	cout << "Extracting GPS locations and SIFT features..." << endl;
 	Extractor extractor;
-	extractor.extract(argv[argc-2], argv[argc-1], "list.in");
+	extractor.extract(argv[1], argv[2], "list.in", sift_jpeg);
+	extractor.writeInfoToTxt(extractor.getVideoName() + ".txt");
 
 	// Display time
 	DisplayTime( (clock()-start_time)/CLOCKS_PER_SEC );
+
+	cin.ignore();
 
 	Point2 x_initial(0.0, 0.0);
 	SharedDiagonal P_initial = 
@@ -77,7 +90,7 @@ int main(int argc, char** argv)
 
 void Usage(const char* prog)
 {
-	cout << "Usage: " << prog << " <video file> <locations file>" << endl;
+	cout << "Usage: " << prog << " <video file> <locations file> [save frames as jpeg = 1 or 0]" << endl;
 	exit(1);
 };
 
